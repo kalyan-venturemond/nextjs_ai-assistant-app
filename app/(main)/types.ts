@@ -1,7 +1,6 @@
-import { Id } from '@/convex/_generated/dataModel';
 
 export type AiAssistant = {
-  _id: Id<'userAiAssistants'>;
+  _id: string; // Id<'userAiAssistants'>
   id: string;
   name: string;
   title: string;
@@ -21,7 +20,7 @@ export type User = {
   email: string;
   picture: string;
   credits: number;
-  _id: Id<'users'>;
+  _id: string; // Id<'users'>
   _creationTime: number;
   orderId?: string;
   stripeCustomerId?: string;

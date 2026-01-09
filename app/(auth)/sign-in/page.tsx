@@ -5,48 +5,29 @@ import React, { useContext } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import { useGoogleLogin } from '@react-oauth/google';
-
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-
 import { AuthContext } from '@/context/AuthContext';
-import { GetAuthUserData } from '@/services/GlobalApi';
-
 import { Button } from '@/components/ui/button';
-
 import { User } from '@/app/(main)/types';
 
-function SignIn() {
-  const CreateUser = useMutation(api.users.CreateUser);
-  const { setUser } = useContext(AuthContext);
 
+function SignIn() {
+  const { setUser } = useContext(AuthContext);
   const router = useRouter();
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user_token', tokenResponse.access_token);
-      }
+  const handleDemoLogin = () => {
+      const mockUser = {
+        _id: 'mock-id',
+        name: 'Demo User',
+        email: 'demo@example.com',
+        picture: 'https://github.com/shadcn.png',
+        credits: 1000,
+        tier: 'Pro', 
+        _creationTime: Date.now()
+      } as unknown as User;
 
-      const { name, email, picture } = await GetAuthUserData(
-        tokenResponse.access_token
-      );
-
-      // Save User Info
-      const newUser = await CreateUser({
-        name,
-        email,
-        picture,
-      });
-
-      setUser(newUser as User);
-
-      // Redirect to home page
+      setUser(mockUser);
       router.replace('/assistants');
-    },
-    onError: (errorResponse) => console.error(errorResponse),
-  });
+  };
 
   return (
     <div className="flex items-center flex-col justify-center h-screen px-5">
@@ -55,11 +36,10 @@ function SignIn() {
         <h2 className="text-2xl">Sign In</h2>
 
         <Button
-          onClick={() => googleLogin()}
+          onClick={handleDemoLogin}
           className="flex items-center gap-2"
         >
-          <Image src="/google.png" alt="Google" width={20} height={20} />
-          Sign in with Google
+          Sign in as Demo User
         </Button>
       </div>
     </div>

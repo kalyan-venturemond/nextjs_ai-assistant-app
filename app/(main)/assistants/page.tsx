@@ -7,9 +7,6 @@ import { useRouter } from 'next/navigation';
 
 import { Loader2Icon } from 'lucide-react';
 
-import { useConvex, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-
 import { BlurFade } from '@/components/magicui/blur-fade';
 import { RainbowButton } from '@/components/magicui/rainbow-button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,10 +21,7 @@ type StaticAssistant = Omit<AiAssistant, '_id' | 'userId' | 'aiModelId'>;
 
 function AIAssistants() {
   const router = useRouter();
-  const convex = useConvex();
   const { user } = useContext(AuthContext);
-
-  const addAssistants = useMutation(api.userAiAssistants.addAssistants);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isContinueDisabled, setIsContinueDisabled] = useState(false);
@@ -56,20 +50,19 @@ function AIAssistants() {
     if (!user?._id) return;
 
     setIsLoading(true);
-    const userAssistants = await convex.query(
-      api.userAiAssistants.getAllUserAssistants,
-      {
-        userId: user._id,
-      }
-    );
+    
+    // Mock data fetching
+    setTimeout(() => {
+        // Assume user has no assistants for demo
+        const userAssistants: any[] = []; 
 
-    // Filter out assistants that user already has
-    const filteredAssistants = aiAssistantsList.filter(
-      (assistant) => !userAssistants.some(({ id }) => id === assistant.id)
-    );
+        const filteredAssistants = aiAssistantsList.filter(
+            (assistant) => !userAssistants.some(({ id }) => id === assistant.id)
+        );
 
-    setAvailableAssistants(filteredAssistants);
-    setIsLoading(false);
+        setAvailableAssistants(filteredAssistants);
+        setIsLoading(false);
+    }, 1000);
   };
 
   const isAssistantSelected = (assistant: StaticAssistant) => {
@@ -92,15 +85,12 @@ function AIAssistants() {
   const saveSelectedAssistants = async () => {
     if (!user?._id) return;
     setIsLoading(true);
-    await addAssistants({
-      aiAssistants: selectedAssistants.map((assistant) => ({
-        ...assistant,
-        userId: user._id,
-        aiModelId: 'google/gemini-2.0-flash',
-      })),
-    });
-    setIsLoading(false);
-    router.replace('/workspace');
+    
+    // Mock save
+    setTimeout(() => {
+        setIsLoading(false);
+        router.replace('/workspace');
+    }, 1000);
   };
 
   return isLoading ? (

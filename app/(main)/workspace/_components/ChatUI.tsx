@@ -2,12 +2,7 @@
 
 import { useContext, useEffect, useRef, useState } from 'react';
 
-import axios from 'axios';
-
 import { Send } from 'lucide-react';
-
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
 
 import { AssistantContext } from '@/context/AssistantContext';
 import { AuthContext } from '@/context/AuthContext';
@@ -18,8 +13,6 @@ import { Input } from '@/components/ui/input';
 import ChatEmptyUI from '@/app/(main)/workspace/_components/ChatEmptyUI';
 import ChatMessage from '@/app/(main)/workspace/_components/ChatMessage';
 
-import { aiModelOptions } from '@/services/AiModelOptions';
-
 type Message = {
   role: 'user' | 'assistant';
   content: string;
@@ -28,8 +21,6 @@ type Message = {
 function ChatUI() {
   const { assistant } = useContext(AssistantContext);
   const { user, setUser } = useContext(AuthContext);
-
-  const updateUserTokens = useMutation(api.users.UpdateUserTokens);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -56,20 +47,20 @@ function ChatUI() {
       { role: 'user', content: finalMessage },
     ]);
 
-    const model = aiModelOptions.find(({ id }) => id === assistant.aiModelId);
-
     // Only clear the input field if we're sending from the input
     if (!suggestionMessage) setMessage('');
 
-    const result = await axios.post('/api/eden-ai-model', {
-      modelId: model?.id,
-      userMessage: finalMessage,
-      prevAssistantMessage: messages[messages?.length - 1]?.content,
-    });
-
-    setIsLoading(false);
-    setMessages((prevMessages) => [...prevMessages, { ...result.data }]);
-    updateUserCredits(result.data.content);
+    // Mock API call
+    setTimeout(() => {
+        const mockResponse: Message = {
+            role: 'assistant',
+            content: `This is a mock response to "${finalMessage}". The backend is disabled for this demo.`
+        };
+        
+        setIsLoading(false);
+        setMessages((prevMessages) => [...prevMessages, mockResponse]);
+        updateUserCredits(mockResponse.content);
+    }, 1500);
   };
 
   useEffect(() => {
@@ -90,13 +81,9 @@ function ChatUI() {
       ? contentMessage.trim().split(/\s+/).length
       : 0;
 
-    const credits = user?.credits - tokenCount;
+    const credits = (user?.credits || 0) - tokenCount;
 
-    await updateUserTokens({
-      userId: user?._id,
-      credits,
-    });
-
+    // Update local state only
     setUser({
       ...user,
       credits,

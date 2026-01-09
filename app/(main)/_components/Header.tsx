@@ -2,7 +2,7 @@
 
 import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { googleLogout } from '@react-oauth/google';
+
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -26,9 +26,6 @@ function Header() {
   const [openUserProfile, setOpenUserProfile] = useState(false);
 
   const handleLogout = () => {
-    // Revoke Google OAuth token
-    googleLogout();
-
     // Clear user from context
     setUser(null);
 

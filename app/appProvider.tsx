@@ -1,10 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
-import { ConvexProvider, ConvexReactClient } from 'convex/react';
-
 import { AuthContext } from '@/context/AuthContext';
 import { User } from '@/app/(main)/types';
 
@@ -13,12 +10,18 @@ function Provider({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [user, setUser] = useState<User | null>(null);
-  const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+  // Mock user for UI demo
+  const [user, setUser] = useState<User | null>({
+    _id: 'mock-id',
+    name: 'Demo User',
+    email: 'demo@example.com',
+    picture: 'https://github.com/shadcn.png',
+    credits: 1000,
+    tier: 'Pro', 
+    _creationTime: Date.now()
+  } as unknown as User);
 
   return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-      <ConvexProvider client={convex}>
         <AuthContext.Provider value={{ user, setUser }}>
           <NextThemesProvider
             attribute="class"
@@ -29,8 +32,6 @@ function Provider({
             {children}
           </NextThemesProvider>
         </AuthContext.Provider>
-      </ConvexProvider>
-    </GoogleOAuthProvider>
   );
 }
 

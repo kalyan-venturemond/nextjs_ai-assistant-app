@@ -2,13 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
-import axios from 'axios';
-
-import { api } from '@/convex/_generated/api';
-import { useMutation } from 'convex/react';
-
-import { WalletCardsIcon } from 'lucide-react';
-import { Loader2Icon } from 'lucide-react';
+import { WalletCardsIcon, Loader2Icon } from 'lucide-react';
 
 import { toast } from 'sonner';
 
@@ -49,8 +43,6 @@ function UserProfile({
 
   const userCredits = (user?.credits ?? 0) >= 0 ? (user?.credits ?? 0) : 0;
 
-  const updateUserTokens = useMutation(api.users.UpdateUserTokens);
-
   const [userMaxToken, setUserMaxToken] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
@@ -63,63 +55,32 @@ function UserProfile({
     if (!user) return;
 
     setIsLoading(true);
-    try {
-      // First, create or get customer
-      const customerResponse = await axios.post('/api/create-customer', {
-        email: user.email,
-        name: user.name,
-      });
-
-      const customerId = customerResponse.data.id;
-
-      // Create checkout session
-      const sessionResponse = await axios.post('/api/create-checkout-session', {
-        customerId,
-        priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID,
-        successUrl: `${window.location.origin}/workspace/success`,
-        cancelUrl: `${window.location.origin}/workspace`,
-      });
-
-      // Redirect to Stripe Checkout
-      window.location.href = sessionResponse.data.url;
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      toast.error('Failed to create checkout session');
-    } finally {
-      setIsLoading(false);
-    }
+    
+    // Mock checkout redirection
+    setTimeout(() => {
+        setIsLoading(false);
+        // Redirect to success page directly for demo
+        window.location.href = `${window.location.origin}/workspace/success`;
+    }, 1000);
   };
 
   const cancelSubscription = async () => {
     if (!user) return;
 
     setIsCanceling(true);
-    try {
-      const response = await axios.post('/api/cancel-subscription', {
-        subscriptionId: user.orderId,
-        userId: user._id,
-      });
-
-      if (response.data.success) {
-        // Update local user state
+    
+    // Mock cancellation
+    setTimeout(() => {
         setUser({
           ...user,
           orderId: undefined,
         });
 
         toast.success(
-          response.data.message ||
-            'Subscription will be canceled at the end of the current period'
+            'Subscription has been canceled (Mock)'
         );
-      } else {
-        toast.error('Failed to cancel subscription');
-      }
-    } catch (error) {
-      console.error('Error canceling subscription:', error);
-      toast.error('Failed to cancel subscription');
-    } finally {
-      setIsCanceling(false);
-    }
+        setIsCanceling(false);
+    }, 1000);
   };
 
   return (

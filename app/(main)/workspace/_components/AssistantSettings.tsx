@@ -4,9 +4,6 @@ import React, { Fragment, useContext, useState } from 'react';
 
 import Image from 'next/image';
 
-import { useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-
 import { Loader2, Loader2Icon, Save, Trash } from 'lucide-react';
 
 import { toast } from 'sonner';
@@ -29,15 +26,20 @@ import { AssistantContext } from '@/context/AssistantContext';
 import type { AiAssistant } from '@/app/(main)/types';
 import AssistantConfirmationAlert from './AssistantConfirmationAlert';
 
+
 function AssistantSettings() {
   const { assistant, setAssistant } = useContext(AssistantContext);
 
-  const updateAssistant = useMutation(
-    api.userAiAssistants.updateUserAiAssistant
-  );
-  const deleteAssistant = useMutation(api.userAiAssistants.deleteAssistant);
-
   const [loading, setLoading] = useState(false);
+
+  // Mock mutation
+  const updateAssistant = async (data: any) => {
+    return new Promise((resolve) => setTimeout(resolve, 1000));
+  };
+  
+  const deleteAssistant = async (data: any) => {
+     return new Promise((resolve) => setTimeout(resolve, 1000));
+  };
 
   const onHandleInputChange = (field: keyof AiAssistant, value: string) => {
     setAssistant({ ...assistant, [field]: value } as AiAssistant);

@@ -2,66 +2,30 @@
 
 import { useContext, useEffect, Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMutation, useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
 import { AuthContext } from '@/context/AuthContext';
 import { toast } from 'sonner';
 
 function SuccessPageContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { user, setUser } = useContext(AuthContext);
-  const updateUserTokens = useMutation(api.users.UpdateUserTokens);
+  // Mock data for UI demo - no backend calls
   const [isChecking, setIsChecking] = useState(true);
 
-  // Get the latest user data
-  const currentUser = useQuery(api.users.GetUser, { email: user?.email || '' });
-
   useEffect(() => {
-    const checkAndUpdateCredits = async () => {
-      if (!user || !currentUser) return;
-
-      // Check if credits were already updated by webhook
-      const creditsWereUpdated = currentUser.credits > user.credits;
-
-      if (!creditsWereUpdated) {
-        console.log('Credits not updated by webhook, attempting manual update');
-
-        // Try to update credits manually (fallback)
-        try {
-          await updateUserTokens({
-            userId: user._id,
-            credits: user.credits + 10000, // PRO_PLAN_CREDITS
-            orderId: currentUser.orderId || 'manual_update',
-          });
-
-          // Update local user state
-          setUser({
-            ...user,
-            credits: user.credits + 10000,
-            orderId: currentUser.orderId || 'manual_update',
-          });
-
-          toast.success('Payment successful! Your credits have been updated.');
-        } catch (error) {
-          console.error('Error updating credits manually:', error);
-          toast.error(
-            'Payment successful, but there was an issue updating your credits. Please contact support.'
-          );
-        }
-      } else {
-        console.log('Credits already updated by webhook');
-        toast.success('Payment successful! Your credits have been updated.');
+    // Simulate payment verification delay
+    const timer = setTimeout(() => {
+      if (user) {
+        setUser({
+          ...user,
+          credits: (user.credits || 0) + 10000,
+        });
+        toast.success('Payment successful! Your credits have been updated (Mock).');
       }
-
       setIsChecking(false);
-    };
-
-    // Wait a bit for webhook to process, then check
-    const timer = setTimeout(checkAndUpdateCredits, 2000);
+    }, 1500);
 
     return () => clearTimeout(timer);
-  }, [user, currentUser, updateUserTokens, setUser]);
+  }, [user, setUser]);
 
   useEffect(() => {
     if (!isChecking) {

@@ -21,20 +21,14 @@ import { Input } from '@/components/ui/input';
 
 import AddNewAssistant from '@/app/(main)/workspace/_components/AddNewAssistant';
 
-import { useConvex } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-
+import { useRouter } from 'next/navigation';
 import { AuthContext } from '@/context/AuthContext';
 import { AssistantContext } from '@/context/AssistantContext';
-
-import type { AiAssistants } from '@/app/(main)/types';
-
+import { AiAssistants } from '@/app/(main)/types';
 import UserProfile from '@/app/(main)/workspace/_components/UserProfile';
-import { googleLogout } from '@react-oauth/google';
-import { useRouter } from 'next/navigation';
+import { aiAssistantsList } from '@/services/AiAssistantsList';
 
 function AssistantList() {
-  const convex = useConvex();
   const router = useRouter();
 
   const { user, setUser } = useContext(AuthContext);
@@ -56,23 +50,21 @@ function AssistantList() {
     setIsLoading(true);
     setAssistants([]);
 
-    const assistants = await convex.query(
-      api.userAiAssistants.getAllUserAssistants,
-      {
-        userId: user._id,
+    // Mock data fetching
+    setTimeout(() => {
+      const mockAssistants = aiAssistantsList as unknown as AiAssistants; 
+      
+      if (!mockAssistants.length) {
+        router.push('/assistants');
+        return;
       }
-    );
 
-    if (!assistants.length) {
-      router.push('/assistants');
-      return;
-    }
+      const [firstAssistant] = mockAssistants ?? [];
 
-    const [assistant] = assistants ?? [];
-
-    setAssistant(assistant);
-    setAssistants(assistants);
-    setIsLoading(false);
+      setAssistant(firstAssistant);
+      setAssistants(mockAssistants);
+      setIsLoading(false);
+    }, 1000);
   };
 
   const filteredAssistants = assistants.filter(
@@ -82,9 +74,6 @@ function AssistantList() {
   );
 
   const handleLogout = () => {
-    // Revoke Google OAuth token
-    googleLogout();
-
     // Clear user from context
     setUser(null);
 

@@ -30,11 +30,7 @@ import { aiModelOptions } from '@/services/AiModelOptions';
 
 import AssistantAvatar from '@/app/(main)/workspace/_components/AssistantAvatar';
 
-import { api } from '@/convex/_generated/api';
-import { useMutation } from 'convex/react';
-
 import { AuthContext } from '@/context/AuthContext';
-
 import { AiAssistant } from '@/app/(main)/types';
 
 const DEFAULT_ASSISTANT = {
@@ -57,7 +53,10 @@ function AddNewAssistant({
 }) {
   const { user } = useContext(AuthContext);
 
-  const addAssistants = useMutation(api.userAiAssistants.addAssistants);
+  // Mock mutation
+  const addAssistants = async (data: any) => {
+    return new Promise((resolve) => setTimeout(resolve, 1000));
+  };
 
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
